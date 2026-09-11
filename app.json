@@ -1,6 +1,7 @@
 {
   "expo": {
     "name": "Given",
+    "description": "Charitable donation log with a tax value guide.",
     "slug": "given-donation-tracker",
     "version": "1.0.0",
     "orientation": "portrait",
