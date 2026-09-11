@@ -1,0 +1,51 @@
+{
+  "expo": {
+    "name": "Given",
+    "slug": "given-donation-tracker",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "automatic",
+    "newArchEnabled": true,
+    "ios": {
+      "supportsTablet": false,
+      "bundleIdentifier": "com.bwk.given",
+      "buildNumber": "1",
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSFaceIDUsageDescription": "Given uses Face ID to lock your donation records so only you can see them."
+      }
+    },
+    "android": {
+      "package": "com.bwk.given",
+      "adaptiveIcon": {
+        "backgroundColor": "#1A1215",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "predictiveBackGestureEnabled": false
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-sqlite",
+      "expo-local-authentication",
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Given lets you attach photos of receipts and donated items from your library to a donation.",
+          "cameraPermission": "Given uses the camera to photograph receipts and donated items for your records."
+        }
+      ]
+    ],
+    "extra": {
+      "revenueCatApiKeyIos": "appl_WADpUyWhUvzYsPlnMpZOFGpqnop",
+      "eas": {
+        "projectId": "17168d87-2acc-4469-814b-46efbe413fb5"
+      }
+    },
+    "owner": "bkdeveloper123"
+  }
+}
