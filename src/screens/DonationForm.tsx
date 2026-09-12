@@ -70,6 +70,27 @@ const KINDS: { key: DonationKind; label: string; icon: string }[] = [
   { key: 'mileage', label: 'Mileage', icon: '🚗' },
 ];
 
+/**
+ * Value-guide picks accumulate into the description. Tapping the same item
+ * twice should read "Jeans x2", not repeat the word — otherwise a bag of
+ * clothes turns the year-end PDF into an unreadable run-on list.
+ */
+export function appendGuideItem(current: string, name: string): string {
+  const parts = current.trim() ? current.trim().split(/,\s*/) : [];
+  const esc = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const re = new RegExp(`^${esc}(?: \u00d7(\\d+))?$`);
+  for (let i = 0; i < parts.length; i++) {
+    const m = parts[i].match(re);
+    if (m) {
+      const n = m[1] ? parseInt(m[1], 10) : 1;
+      parts[i] = `${name} \u00d7${n + 1}`;
+      return parts.join(', ');
+    }
+  }
+  parts.push(name);
+  return parts.join(', ');
+}
+
 export default function DonationFormModal({ visible, donationId, onClose }: Props) {
   const theme = useTheme();
   const { isPro, showPaywall, bumpItems, settings, year } = useApp();
@@ -203,7 +224,7 @@ export default function DonationFormModal({ visible, donationId, onClose }: Prop
     const add = guideMidCents(item);
     const current = parseDollarsToCents(valueText);
     setValueText(centsToEditable(current + add));
-    setDescription((d) => (d.trim() ? `${d.trim()}, ${item.name}` : item.name));
+    setDescription((d) => appendGuideItem(d, item.name));
     if (!method) setMethod('Thrift-shop value');
     if (!condition) setCondition('Good');
     Haptics.selectionAsync().catch(() => {});

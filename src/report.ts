@@ -53,6 +53,22 @@ async function donationRow(d: Donation): Promise<string> {
         : `<div class="noimg">photo not available</div>`;
     }
   }
+  // A goods entry built from the value guide can carry 20+ item names. As a bold
+  // headline that swamps the page, so anything long becomes a quiet detail line
+  // under a counted summary instead.
+  const fallback = d.kind === 'cash' ? 'Cash gift' : d.kind === 'mileage' ? 'Volunteer driving' : 'Donated goods';
+  const desc = (d.description || '').trim();
+  let headline = desc || fallback;
+  let itemList = '';
+  if (d.kind === 'goods' && desc.length > 80) {
+    const count = desc.split(/,\s*/).reduce((n, part) => {
+      const m = part.match(/\u00d7(\d+)\s*$/);
+      return n + (m ? parseInt(m[1], 10) : 1);
+    }, 0);
+    headline = `Donated goods — ${count} item${count === 1 ? '' : 's'}`;
+    itemList = desc;
+  }
+
   const meta: string[] = [];
   if (d.kind === 'goods' && d.condition) meta.push(`Condition: ${esc(d.condition)}`);
   if (d.kind === 'goods' && d.method) meta.push(`Valued by: ${esc(d.method)}`);
@@ -65,7 +81,8 @@ async function donationRow(d: Donation): Promise<string> {
       <td class="date">${prettyDate(d.date)}</td>
       <td class="kind">${KIND_LABEL[d.kind]}</td>
       <td>
-        <div class="name">${esc(d.description || (d.kind === 'cash' ? 'Cash gift' : d.kind === 'mileage' ? 'Volunteer driving' : 'Donated goods'))}</div>
+        <div class="name">${esc(headline)}</div>
+        ${itemList ? `<div class="items">${esc(itemList)}</div>` : ''}
         ${meta.length ? `<div class="meta">${meta.join(' · ')}</div>` : ''}
       </td>
       <td class="value">${formatCents(d.valueCents)}</td>
@@ -94,8 +111,14 @@ export async function buildReportHtml(year: number): Promise<string> {
 
   const flags: string[] = [];
   if (totals.goodsOver500) {
+    // Form 8283 asks for the donee's address. Only promise it is here if it is.
+    const withAddress = groups.filter((g) => g.charity?.address).length;
+    const missing = groups.length - withAddress;
     flags.push(
-      'Noncash donations total more than $500 for the year, so Form 8283 (Section A) is generally required with the return. The donee name/address, date, description, and how the value was determined are on this report.'
+      'Noncash donations total more than $500 for the year, so Form 8283 (Section A) is generally required with the return. ' +
+        (missing === 0
+          ? 'The donee name/address, date, description, and how the value was determined are on this report.'
+          : `The date, description, and how the value was determined are on this report. Form 8283 also asks for each charity's address — ${missing} of ${groups.length} here ${missing === 1 ? 'is' : 'are'} missing one, which you can add in Settings under Charities.`)
     );
   }
   if (totals.anyGoodsOver5000) {
@@ -132,11 +155,12 @@ export async function buildReportHtml(year: number): Promise<string> {
   td.value { text-align: right; white-space: nowrap; font-weight: 600; width: 90px; }
   .name { font-weight: 600; font-size: 13px; }
   .meta { color: #6e5a62; font-size: 11px; margin-top: 2px; }
+  .items { color: #4a3a40; font-size: 11px; margin-top: 2px; line-height: 1.4; }
   .noimg { width: 52px; height: 52px; border-radius: 6px; background: #f4e8ec; color: #a28f97; font-size: 8px; display: flex; align-items: center; justify-content: center; text-align: center; }
   .flags { margin-top: 22px; border: 1px solid #efd3dc; border-radius: 10px; padding: 12px 14px; font-size: 11.5px; line-height: 1.5; page-break-inside: avoid; }
   .flags b { display: block; margin-bottom: 4px; }
   .flags p { margin: 4px 0; }
-  .footer { margin-top: 24px; color: #a28f97; font-size: 10px; text-align: center; line-height: 1.5; }
+  .footer { margin-top: 24px; color: #6e5a62; font-size: 10px; text-align: center; line-height: 1.5; }
 </style></head>
 <body>
   <h1>Charitable Contributions — Tax Year ${year}</h1>
