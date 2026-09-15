@@ -99,6 +99,16 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
 
   // Localized prices for the always-visible disclosure below. They are blank
   // until StoreKit answers — the disclosure still renders without them.
+  // Apple 3.1.2(c): an introductory free trial must be stated in the app.
+  const annualPkg = packages.find((p) => p.packageType === 'ANNUAL');
+  const annualIntro = annualPkg?.product.introPrice;
+  const trialText =
+    annualIntro && annualIntro.price === 0
+      ? `${annualIntro.periodNumberOfUnits} ${annualIntro.periodUnit.toLowerCase()}${
+          annualIntro.periodNumberOfUnits === 1 ? '' : 's'
+        } free`
+      : null;
+
   const lifetimePrice = packages.find((p) => p.packageType === 'LIFETIME')?.product
     .priceString;
   const annualPrice = packages.find((p) => p.packageType === 'ANNUAL')?.product
@@ -183,7 +193,7 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
                       </Text>
                       {isAnnual && (
                         <Text style={[styles.pkgBadge, { color: theme.accent }]}>
-                          {monthly ? `Most popular · ${monthly}, billed yearly` : 'Most popular · billed yearly'}
+                          {trialText ? `${trialText}, then ${p.product.priceString}/yr` : monthly ? `Most popular · ${monthly}, billed yearly` : 'Most popular · billed yearly'}
                         </Text>
                       )}
                       {isLifetime && (
@@ -236,7 +246,8 @@ export default function PaywallModal({ privacyUrl }: { privacyUrl: string }) {
           <Text style={[styles.legalText, { color: theme.textSecondary }]}>
             Given Pro — Yearly{annualPrice ? ` ${annualPrice}` : ''}, an
             auto-renewing subscription billed once per year until cancelled
-            (cancel anytime in your Apple ID settings); or Lifetime
+            (cancel anytime in your Apple ID settings)
+            {trialText ? `, starting with ${trialText} — you are not charged until it ends` : ''}; or Lifetime
             {lifetimePrice ? ` ${lifetimePrice}` : ''}, a one-time purchase.
           </Text>
           <View style={styles.legalLinks}>
