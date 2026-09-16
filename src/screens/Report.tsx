@@ -73,7 +73,7 @@ export default function ReportScreen() {
     <ScrollView contentContainerStyle={styles.scroll}>
       <Text style={[styles.title, { color: theme.text }]}>Tax summary</Text>
       <Text style={[styles.sub, { color: theme.textSecondary }]}>
-        Everything you gave in {year}, grouped by charity with values, receipts, and photos. The document your preparer (or TurboTax) asks for in April.
+        Everything you gave in {year}, grouped by charity with values, receipts, and photos. The document your preparer or your tax software asks for in April.
       </Text>
 
       <Card theme={theme} style={styles.statsCard}>

@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import Constants from 'expo-constants';
 import {
   Alert,
   KeyboardAvoidingView,
@@ -255,7 +256,7 @@ export default function SettingsScreen() {
         </Pressable>
       </Card>
 
-      <Text style={[styles.version, { color: theme.textFaint }]}>Given v1.0.0 · Made with care in NYC</Text>
+      <Text style={[styles.version, { color: theme.textFaint }]}>Given v{Constants.expoConfig?.version ?? ''} · Made with care in NYC</Text>
 
       <Modal visible={editing !== null} animationType="slide" presentationStyle="pageSheet" onRequestClose={() => setEditing(null)}>
         <KeyboardAvoidingView style={{ flex: 1, backgroundColor: theme.bg }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
