@@ -19,10 +19,10 @@ async function askOnce(): Promise<void> {
 
 /**
  * Ask for an App Store rating exactly once, at a happy moment.
- * Trigger 1: right after the user's 5th donation is saved (they're invested).
+ * Trigger 1: right after the first saved entry, so early users see it.
  */
 export async function maybeRequestReview(itemCount: number): Promise<void> {
-  if (itemCount < 5) return;
+  if (itemCount < 1) return;
   await askOnce();
 }
 
